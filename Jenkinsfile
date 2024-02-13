@@ -4,9 +4,10 @@ pipeline {
     triggers {
         pollSCM('H/5 * * * *') // Запускать будем автоматически по крону примерно раз в 5 минут
     }
+
     tools {
         maven 'maven-3.8.1' // Для сборки бэкенда нужен Maven
-        jdk 'jdk17' // И Java Developer Kit нужной версии
+        jdk 'jdk16' // И Java Developer Kit нужной версии
         nodejs 'node-16' // А NodeJS нужен для фронта
     }
 
@@ -37,15 +38,8 @@ pipeline {
         stage('Save artifacts') {
             steps {
                 archiveArtifacts(artifacts: 'backend/target/sausage-store-0.0.1-SNAPSHOT.jar')
-                archiveArtifacts(artifacts: 'frontend/dist/frontend/*')\
+                archiveArtifacts(artifacts: 'frontend/dist/frontend/*')
             }
-        post {
-	  success {
-	    sh (
-		"curl -X POST -H 'Content-type: application/json' --data '{\"chat_id\": \"-1002042084305\", \"text\": \"Алексей собрал приложение.\" }' https://api.telegram.org/bot5933756043:AAE8JLL5KIzgrNBeTP5e-1bkbJy4YRoeGjs/sendMessage"
-	    )
-	  }
-    	}
-       }     
-    }   
+        }
+    }
 }
