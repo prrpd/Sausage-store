@@ -4,6 +4,7 @@ pipeline {
     triggers {
         pollSCM('H/5 * * * *') // Запускать будем автоматически по крону примерно раз в 5 минут
     }
+    
     tools {
         maven 'maven-3.8.1' // Для сборки бэкенда нужен Maven
         jdk '' // И Java Developer Kit нужной версии
@@ -37,7 +38,7 @@ pipeline {
         stage('Save artifacts') {
             steps {
                 archiveArtifacts(artifacts: 'backend/target/sausage-store-0.0.1-SNAPSHOT.jar')
-                archiveArtifacts(artifacts: 'frontend/dist/frontend/*')\
+                archiveArtifacts(artifacts: 'frontend/dist/frontend/*')
             }
         post {
 	  success {
