@@ -4,8 +4,9 @@ pipeline {
     triggers {
         pollSCM('H/5 * * * *') // Запускать будем автоматически по крону примерно раз в 5 минут
     }
-
-    steps {
+    stages { 
+      steps {
                     sh 'java -version'
                 }
+    }
 }
