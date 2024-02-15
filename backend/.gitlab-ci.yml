@@ -3,6 +3,9 @@ build-backend-code-job:
   only:
     changes:
     - backend/*
+  cache:
+    paths:
+      - ${CI_PROJECT_DIR}/.m2/repository
   script:
     - cd backend
     - mvn package
@@ -13,7 +16,10 @@ build-backend-code-job:
       - backend/target/sausage-store-0.0.1-SNAPSHOT.jar
     reports:
       dotenv: job.env
-      
+
+#SAST:
+#  stage: test
+    
 telegram-notification-backend:
   stage: notify
   only:
