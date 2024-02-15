@@ -6,7 +6,7 @@ build-backend-code-job:
   cache:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
-      - .m2/repository
+      - $CI_PROJECT_DIR/.m2/repository
   script:
     - cd backend
     - mvn package
@@ -22,7 +22,7 @@ sonarqube-backend-sast:
   stage: test
   image: maven:3.8-openjdk-16
   variables:
-    MAVEN_OPTS: "-Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository"
+    MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
   script:
     - mvn -f backend/pom.xml verify sonar:sonar -Dsonar.qualitygate.wait=true -Dsonar.token=$SONAR_TOKEN -Dsonar.host.url=$SONARQUBE_URL -Dsonar.projectName=$SONAR_PROJECT_KEY -Dsonar.projectKey=$SONAR_PROJECT_KEY_BACK
   allow_failure: true
