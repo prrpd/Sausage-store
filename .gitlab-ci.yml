@@ -6,4 +6,3 @@ stages:
 include:
   - 'backend/.gitlab-ci.yml'
   - 'frontend/.gitlab-ci.yml'
-  - template: Security/SAST.gitlab-ci.yml

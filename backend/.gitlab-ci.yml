@@ -1,3 +1,6 @@
+include:
+  template: Security/SAST.gitlab-ci.yml
+
 build-backend-code-job:
   stage: build  
   only:
@@ -17,8 +20,12 @@ build-backend-code-job:
     reports:
       dotenv: job.env
 
-#SAST:
-#  stage: test
+spotbugs-sast:
+  stage: test
+  variables:
+    COMPILE: "false"
+    SAST_JAVA_VERSION: 11
+    MAVEN_REPO_PATH: ${CI_PROJECT_DIR}/.m2/repository # не забудьте при сборке также указывать эту папку через аргумент -Dmaven.repo.local
     
 telegram-notification-backend:
   stage: notify
