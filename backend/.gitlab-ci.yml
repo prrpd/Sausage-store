@@ -17,6 +17,13 @@ build-backend-code-job:
     reports:
       dotenv: job.env
 
+sonarqube-backend-sast:
+  stage: test
+  image: maven:3.8-openjdk-16
+  script:
+    - mvn verify sonar:sonar -Dsonar.qualitygate.wait=true -Dsonar.token=${SONAR_TOKEN} -Dsonar.host.url=${SONARQUBE_URL} -Dsonar.projectName=${SONAR_PROJECT_KEY} -Dsonar.projectKey=${SONAR_PROJECT_KEY_BACK}
+  allow_failure: true
+
 include:
   - template: Security/SAST.gitlab-ci.yml
 
