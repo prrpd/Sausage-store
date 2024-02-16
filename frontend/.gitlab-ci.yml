@@ -21,7 +21,7 @@ sonarqube-frontend-sast:
     name: sonarsource/sonar-scanner-cli:latest
     entrypoint: [""]
   script:
-    - sonar-scanner -Dsonar.projectKey=$SONAR_PROJECT_KEY_FRONT -Dsonar.sources=. -Dsonar.host.url=$SONARQUBE_URL -Dsonar.token=$SONAR_TOKEN_FRONT -Dsonar.java.binaries= **/*.java
+    - sonar-scanner -Dsonar.projectKey=$SONAR_PROJECT_KEY_FRONT -Dsonar.sources=. -Dsonar.host.url=$SONARQUBE_URL -Dsonar.token=$SONAR_TOKEN_FRONT
   allow_failure: true
 
 telegram-notification-frontend:
