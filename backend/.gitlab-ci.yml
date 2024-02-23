@@ -3,6 +3,10 @@ build-backend-code-job:
   only:
     changes:
     - backend/*
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - $CI_PROJECT_DIR/.m2/repository
   script:
     - cd backend
     - mvn package
@@ -13,7 +17,26 @@ build-backend-code-job:
       - backend/target/sausage-store-0.0.1-SNAPSHOT.jar
     reports:
       dotenv: job.env
-      
+
+sonarqube-backend-sast:
+  stage: test
+  image: maven:3.8-openjdk-16
+  variables:
+    MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  script:
+    - mvn -f backend/pom.xml verify sonar:sonar -Dsonar.qualitygate.wait=true -Dsonar.token=$SONAR_TOKEN -Dsonar.host.url=$SONARQUBE_URL -Dsonar.projectName=$SONAR_PROJECT_KEY -Dsonar.projectKey=$SONAR_PROJECT_KEY_BACK
+  allow_failure: true
+
+include:
+  - template: Security/SAST.gitlab-ci.yml
+
+spotbugs-sast:
+  stage: test
+  variables:
+    COMPILE: "false"
+    SAST_JAVA_VERSION: 11
+    MAVEN_REPO_PATH: $CI_PROJECT_DIR/.m2/repository # не забудьте при сборке также указывать эту папку через аргумент -Dmaven.repo.local
+
 telegram-notification-backend:
   stage: notify
   only:
@@ -22,7 +45,7 @@ telegram-notification-backend:
     variables:
     - $CI_COMMIT_MESSAGE =~ /send notification/
   script:
-    - 'curl -X POST -H "Content-type: application/json" --data "{\"chat_id\": \"-1002042084305\", \"text\": \"Backend is ready. Artefact - ${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_SHA}/download?job=${JOB_NAME}
-  \" }" https://api.telegram.org/bot5933756043:AAE8JLL5KIzgrNBeTP5e-1bkbJy4YRoeGjs/sendMessage'
+    - 'curl -X POST -H "Content-type: application/json" --data "{\"chat_id\": \"-1002042084305\", \"text\": \"Sprint 2. Backend is ready and checked. Artifact - ${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_SHA}/download?job=${JOB_NAME}
+  \" }" https://api.telegram.org/bot${TG_bot_token}/sendMessage'
   needs:
     - build-backend-code-job
