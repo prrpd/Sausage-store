@@ -1,8 +1,9 @@
+---
 build-backend-code-job:
-  stage: build  
+  stage: build
   only:
     changes:
-    - backend/*
+      - backend/*
   cache:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
@@ -17,20 +18,6 @@ build-backend-code-job:
       - backend/target/sausage-store-0.0.1-SNAPSHOT.jar
     reports:
       dotenv: job.env
-      
-upload-backend-release:
-  stage: release
-  only:
-    changes:
-      - backend/**/*
-  needs:
-    - build-backend-code-job
-  script:
-    - cd backend
-    - >
-   mvn deploy -DskipTests
-   -Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository
-   -s ../settings.xml -Dversion.application=${VERSION} 
 
 sonarqube-backend-sast:
   stage: test
@@ -38,7 +25,7 @@ sonarqube-backend-sast:
   variables:
     MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
   script:
-    - mvn -f backend/pom.xml verify sonar:sonar -Dsonar.qualitygate.wait=true -Dsonar.token=$SONAR_TOKEN -Dsonar.host.url=$SONARQUBE_URL -Dsonar.projectName=$SONAR_PROJECT_KEY -Dsonar.projectKey=$SONAR_PROJECT_KEY_BACK
+    - mvn -f backend/pom.xml verify sonar:sonar -Dsonar.qualitygate.wait=true -Dsonar.token=$SONAR_TOKEN-Dsonar.host.url=$SONARQUBE_URL -Dsonar.projectName=$SONAR_PROJECT_KEY -Dsonar.projectKey=$SONAR_PROJECT_KEY_BACK
   allow_failure: true
 
 include:
@@ -49,15 +36,15 @@ spotbugs-sast:
   variables:
     COMPILE: "false"
     SAST_JAVA_VERSION: 11
-    MAVEN_REPO_PATH: $CI_PROJECT_DIR/.m2/repository # не забудьте при сборке также указывать эту папку через аргумент -Dmaven.repo.local
+    MAVEN_REPO_PATH: $CI_PROJECT_DIR/.m2/repository  
 
 telegram-notification-backend:
   stage: notify
   only:
     changes:
-    - backend/*
+      - backend/*
     variables:
-    - $CI_COMMIT_MESSAGE =~ /send notification/
+      - $CI_COMMIT_MESSAGE =~ /send notification/
   script:
     - 'curl -X POST -H "Content-type: application/json" --data "{\"chat_id\": \"-1002042084305\", \"text\": \"Sprint 2. Backend is ready and checked. Artifact - ${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_SHA}/download?job=${JOB_NAME}
   \" }" https://api.telegram.org/bot${TG_bot_token}/sendMessage'
