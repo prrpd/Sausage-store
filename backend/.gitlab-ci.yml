@@ -10,8 +10,8 @@ variables:
 
 stages:
   - build
-  - release
   - test
+  - release
 
 build:
   stage: build
