@@ -8,6 +8,7 @@ variables:
 
 stages:
   - build
+  - test
   - release
 
 build:
@@ -31,24 +32,24 @@ release:
   only:
     changes:
       - frontend/**/*
-# sonarqube-frontend-sast:
-# stage: test
-# image:
-# name: sonarsource/sonar-scanner-cli:latest
-# entrypoint: [""]
-# script:
-# - cd frontend
-# - sonar-scanner -Dsonar.projectKey=$SONAR_PROJECT_KEY_FRONT -Dsonar.sources=. -Dsonar.host.url=$SONARQUBE_URL -Dsonar.token=$SONAR_TOKEN_FRONT
-# allow_failure: true
 
+sonarqube-frontend-sast:
+  stage: test
+  image:
+  name: sonarsource/sonar-scanner-cli:latest
+  entrypoint: [""]
+  script:
+    - cd frontend
+    - sonar-scanner -Dsonar.projectKey=$SONAR_PROJECT_KEY_FRONT -Dsonar.sources=. -Dsonar.host.url=$SONARQUBE_URL -Dsonar.token=$SONAR_TOKEN_FRONT
+  allow_failure: true
 # telegram-notification-frontend:
-# stage: notify
-# only:
-# changes:
-# - frontend/*
-# variables:
-# - $CI_COMMIT_MESSAGE =~ /send notification/
-# script:
-# - 'curl -X POST -H "Content-type: application/json" --data "{\"chat_id\": \"-1002042084305\", \"text\": \"Sprint 2. Frontend is ready and checked. Artifact - ${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_SHA}/download?job=${JOB_NAME}\" }" https://api.telegram.org/bot${TG_bot_token}/sendMessage'
-# needs:
-# - build-frontend-code-job
+#   stage: notify
+#   only:
+#     changes:
+#       - frontend/*
+#   variables:
+#     - $CI_COMMIT_MESSAGE =~ /send notification/
+#   script:
+#     - 'curl -X POST -H "Content-type: application/json" --data "{\"chat_id\": \"-1002042084305\", \"text\": \"Sprint 2. Frontend is ready and checked. Artifact - ${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_SHA}/download?job=${JOB_NAME}\" }" https://api.telegram.org/bot${TG_bot_token}/sendMessage'
+#   needs:
+#     - build

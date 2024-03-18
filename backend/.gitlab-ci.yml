@@ -56,18 +56,17 @@ spotbugs-sast:
     COMPILE: "false"
     SAST_JAVA_VERSION: 11
     MAVEN_REPO_PATH: $CI_PROJECT_DIR/.m2/repository
-
-telegram-notification-backend:
-  stage: notify
-  rules:
-    - if: $CI_COMMIT_MESSAGE =~ /send notification/
-    - changes:
-        - backend/*
-  script:
-    - >
-      'curl -X POST -H "Content-type: application/json"
-      --data "{\"chat_id\": \"-1002042084305\", \"text\": \"Sprint 2. Backend is ready and checked. 
-      Artifact - ${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_SHA}/download?job=${JOB_NAME}\" }" 
-      https://api.telegram.org/bot${TG_bot_token}/sendMessage'
-  needs:
-    - build
+# telegram-notification-backend:
+#   stage: notify
+#   rules:
+#     - if: $CI_COMMIT_MESSAGE =~ /send notification/
+#     - changes:
+#         - backend/*
+#   script:
+#     - >
+#       'curl -X POST -H "Content-type: application/json"
+#       --data "{\"chat_id\": \"-1002042084305\", \"text\": \"Sprint 2. Backend is ready and checked.
+#       Artifact - ${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_SHA}/download?job=${JOB_NAME}\" }"
+#       https://api.telegram.org/bot${TG_bot_token}/sendMessage'
+#   needs:
+#     - build
