@@ -62,5 +62,13 @@
             </plugin>
         </plugins>
     </build>
-
+	
+    <distributionManagement>
+      <repository>
+           <id>sausage-store</id>
+           <name>sausage-store</name>
+           <url>${env.NEXUS_REPO_URL}/repository/${env.NEXUS_REPO_BACKEND_NAME}</url>
+       </repository>
+    </distributionManagement>
+  
 </project>

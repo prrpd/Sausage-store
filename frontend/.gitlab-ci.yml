@@ -14,6 +14,31 @@ build-frontend-code-job:
       - frontend/dist/frontend
     reports:
       dotenv: job.env
+      
+upload-frontend-release:
+  stage: release
+  only:
+    changes:
+    - frontend/**/*
+  needs:
+    - build-frontend-code-job
+  script:
+    - cd frontend/dist
+    - tar czvf sausage-store-${VERSION}.tar.gz frontend
+    - >
+   curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}"
+   --upload-file sausage-store-${VERSION}.tar.gz
+   ${NEXUS_REPO_URL}/${NEXUS_REPO_FRONTEND_NAME}/${VERSION}/sausage-store-${VERSION}.tar.gz 
+
+sonarqube-frontend-sast:
+  stage: test
+  image: 
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+  script:
+    - cd frontend
+    - sonar-scanner -Dsonar.projectKey=$SONAR_PROJECT_KEY_FRONT -Dsonar.sources=. -Dsonar.host.url=$SONARQUBE_URL -Dsonar.token=$SONAR_TOKEN_FRONT
+  allow_failure: true
 
 telegram-notification-frontend:
   stage: notify
@@ -23,7 +48,6 @@ telegram-notification-frontend:
     variables:
     - $CI_COMMIT_MESSAGE =~ /send notification/
   script:
-    - 'curl -X POST -H "Content-type: application/json" --data "{\"chat_id\": \"-1002042084305\", \"text\": \"Frontend is ready. Artefact - ${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_SHA}/download?job=${JOB_NAME}\" }" https://api.telegram.org/bot5933756043:AAE8JLL5KIzgrNBeTP5e-1bkbJy4YRoeGjs/sendMessage'
+    - 'curl -X POST -H "Content-type: application/json" --data "{\"chat_id\": \"-1002042084305\", \"text\": \"Sprint 2. Frontend is ready and checked. Artifact - ${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_SHA}/download?job=${JOB_NAME}\" }" https://api.telegram.org/bot${TG_bot_token}/sendMessage'
   needs:
     - build-frontend-code-job
-

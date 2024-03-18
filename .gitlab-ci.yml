@@ -1,6 +1,8 @@
 stages:
   - build
+  - test
   - notify
+  - release
 
 include:
   - 'backend/.gitlab-ci.yml'
