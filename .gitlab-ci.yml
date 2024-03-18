@@ -7,3 +7,32 @@ stages:
 include:
   - 'backend/.gitlab-ci.yml'
   - 'frontend/.gitlab-ci.yml'
+
+upload-backend-release:
+  stage: release
+  only:
+    changes:
+      - backend/**/*
+  needs:
+    - build-backend-code-job
+  script:
+    - cd backend
+    - >
+   mvn deploy -DskipTests
+   -Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository
+   -s ../settings.xml -Dversion.application=${VERSION} 
+   
+upload-frontend-release:
+  stage: release
+  only:
+    changes:
+    - frontend/**/*
+  needs:
+    - build-frontend-code-job
+  script:
+    - cd frontend/dist
+    - tar czvf sausage-store-${VERSION}.tar.gz frontend
+    - >
+   curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}"
+   --upload-file sausage-store-${VERSION}.tar.gz
+   ${NEXUS_REPO_URL}/${NEXUS_REPO_FRONTEND_NAME}/${VERSION}/sausage-store-${VERSION}.tar.gz
