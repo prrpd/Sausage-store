@@ -59,11 +59,10 @@ spotbugs-sast:
 
 telegram-notification-backend:
   stage: notify
-  only:
-    changes:
-      - backend/*
   rules:
     - if: $CI_COMMIT_MESSAGE =~ /send notification/
+    - changes:
+        - backend/*
   script:
     - >
       'curl -X POST -H "Content-type: application/json"
