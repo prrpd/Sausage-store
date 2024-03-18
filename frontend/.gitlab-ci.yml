@@ -36,8 +36,8 @@ release:
 sonarqube-frontend-sast:
   stage: test
   image:
-  name: sonarsource/sonar-scanner-cli:latest
-  entrypoint: [""]
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
   script:
     - cd frontend
     - sonar-scanner -Dsonar.projectKey=$SONAR_PROJECT_KEY_FRONT -Dsonar.sources=. -Dsonar.host.url=$SONARQUBE_URL -Dsonar.token=$SONAR_TOKEN_FRONT
