@@ -62,8 +62,8 @@ telegram-notification-backend:
   only:
     changes:
       - backend/*
-  variables:
-    - $CI_COMMIT_MESSAGE =~ /send notification/
+  rules:
+    - if: $CI_COMMIT_MESSAGE =~ /send notification/
   script:
     - >
       'curl -X POST -H "Content-type: application/json"
