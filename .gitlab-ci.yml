@@ -1,3 +1,4 @@
+---
 stages:
   - build
   - test
@@ -18,21 +19,21 @@ upload-backend-release:
   script:
     - cd backend
     - >
-   mvn deploy -DskipTests
-   -Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository
-   -s ../settings.xml -Dversion.application=${VERSION} 
-   
+      mvn deploy -DskipTests
+      -Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository
+      -s settings.xml -Dversion.application=${VERSION}
+
 upload-frontend-release:
   stage: release
   only:
     changes:
-    - frontend/**/*
+      - frontend/**/*
   needs:
     - build-frontend-code-job
   script:
     - cd frontend/dist
     - tar czvf sausage-store-${VERSION}.tar.gz frontend
     - >
-   curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}"
-   --upload-file sausage-store-${VERSION}.tar.gz
-   ${NEXUS_REPO_URL}/${NEXUS_REPO_FRONTEND_NAME}/${VERSION}/sausage-store-${VERSION}.tar.gz
+      curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}"
+      --upload-file sausage-store-${VERSION}.tar.gz
+      ${NEXUS_REPO_URL}/repository/${NEXUS_REPO_FRONTEND_NAME}/${VERSION}/sausage-store-${VERSION}.tar.gz
