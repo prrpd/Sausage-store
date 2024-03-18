@@ -4,66 +4,65 @@ cache:
     - ${CI_PROJECT_DIR}/.m2/repository
 
 variables:
-   VERSION: 1.0.${CI_PIPELINE_ID}
-   MAVEN_REPO_PATH: ${CI_PROJECT_DIR}/.m2/repository
-   JAVA_OPTS: -XX:MaxRAMPercentage=90 # для того, чтобы Maven не съел всю свободную оперативку
+  VERSION: 1.0.${CI_PIPELINE_ID}
+  MAVEN_REPO_PATH: ${CI_PROJECT_DIR}/.m2/repository
+  JAVA_OPTS: -XX:MaxRAMPercentage=90 # для того, чтобы Maven не съел всю свободную оперативку
 
 stages:
-   - build
-   - release
+  - build
+  - release
 
 build:
-   stage: build
-   script:
-      - cd backend
-      - >
-         mvn package
-         -Dversion.application=${VERSION}
-         -Dmaven.repo.local=${MAVEN_REPO_PATH}
-   rules: # rules и only в данных случаях взаимозаменяемы
-      - changes:
-           - backend/**/*
+  stage: build
+  script:
+    - cd backend
+    - >
+      mvn package
+      -Dversion.application=${VERSION}
+      -Dmaven.repo.local=${MAVEN_REPO_PATH}
+  rules: # rules и only в данных случаях взаимозаменяемы
+    - changes:
+        - backend/**/*
 
 release:
-   stage: release
-   script:
-      - cd backend
-      - >
-         mvn deploy -DskipTests -s settings.xml
-         -Dversion.application=${VERSION}
-         -Dmaven.repo.local=${MAVEN_REPO_PATH}
-   rules:
-      - changes:
-           - backend/**/*
-
+  stage: release
+  script:
+    - cd backend
+    - >
+      mvn deploy -DskipTests -s settings.xml
+      -Dversion.application=${VERSION}
+      -Dmaven.repo.local=${MAVEN_REPO_PATH}
+  rules:
+    - changes:
+        - backend/**/*
 # sonarqube-backend-sast:
-  # stage: test
-  # image: maven:3.8-openjdk-16
-  # variables:
-    # MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
-  # script:
-    # - mvn -f backend/pom.xml verify sonar:sonar -Dsonar.qualitygate.wait=true -Dsonar.token=$SONAR_TOKEN-Dsonar.host.url=$SONARQUBE_URL -Dsonar.projectName=$SONAR_PROJECT_KEY -Dsonar.projectKey=$SONAR_PROJECT_KEY_BACK
-  # allow_failure: true
+# stage: test
+# image: maven:3.8-openjdk-16
+# variables:
+# MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+# script:
+# - mvn -f backend/pom.xml verify sonar:sonar -Dsonar.qualitygate.wait=true -Dsonar.token=$SONAR_TOKEN-Dsonar.host.url=$SONARQUBE_URL -Dsonar.projectName=$SONAR_PROJECT_KEY -Dsonar.projectKey=$SONAR_PROJECT_KEY_BACK
+# allow_failure: true
 
 # include:
-  # - template: Security/SAST.gitlab-ci.yml
+# - template: Security/SAST.gitlab-ci.yml
 
 # spotbugs-sast:
-  # stage: test
-  # variables:
-    # COMPILE: "false"
-    # SAST_JAVA_VERSION: 11
-    # MAVEN_REPO_PATH: $CI_PROJECT_DIR/.m2/repository  
+# stage: test
+# variables:
+# COMPILE: "false"
+# SAST_JAVA_VERSION: 11
+# MAVEN_REPO_PATH: $CI_PROJECT_DIR/.m2/repository
 
 # telegram-notification-backend:
-  # stage: notify
-  # only:
-    # changes:
-      # - backend/*
-    # variables:
-      # - $CI_COMMIT_MESSAGE =~ /send notification/
-  # script:
-    # - 'curl -X POST -H "Content-type: application/json" --data "{\"chat_id\": \"-1002042084305\", \"text\": \"Sprint 2. Backend is ready and checked. Artifact - ${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_SHA}/download?job=${JOB_NAME}
-  # \" }" https://api.telegram.org/bot${TG_bot_token}/sendMessage'
-  # needs:
-    # - build-backend-code-job
+# stage: notify
+# only:
+# changes:
+# - backend/*
+# variables:
+# - $CI_COMMIT_MESSAGE =~ /send notification/
+# script:
+# - 'curl -X POST -H "Content-type: application/json" --data "{\"chat_id\": \"-1002042084305\", \"text\": \"Sprint 2. Backend is ready and checked. Artifact - ${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_SHA}/download?job=${JOB_NAME}
+# \" }" https://api.telegram.org/bot${TG_bot_token}/sendMessage'
+# needs:
+# - build-backend-code-job
