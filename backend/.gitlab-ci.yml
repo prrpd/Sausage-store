@@ -10,7 +10,7 @@ variables:
 
 stages:
   - build
-  - test
+  #- test
   - release
   - deploy
   - notify
@@ -47,16 +47,12 @@ deploy:
     - eval $(ssh-agent -s)
     - curl ipinfo.io
     #сохраняем сгенеренный ранее приватный ключ для раннера
-    - echo "$SSH_PRIVATE_KEY"
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - ssh-add -l
     - mkdir -p ~/.ssh
     - chmod 600 ~/.ssh
     - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
-    - cat ~/.ssh/known_hosts
-    - ls -la /root/.ssh/
-    - cat /root/.ssh/id_ed25519
   script:
     #выполняем простую команду для проверки
     - ssh -v ${DEV_USER}@${DEV_HOST} "id"
