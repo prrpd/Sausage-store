@@ -12,6 +12,7 @@ stages:
   - build
   - test
   - release
+  - deploy
   - notify
 
 build:
@@ -37,6 +38,20 @@ release:
   rules:
     - changes:
         - backend/**/*
+
+deploy:
+  stage: deploy
+  before_script:
+    #устанавливаем ssh-agent для удобства аутентификации по ssh
+    - "command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )"
+    - eval $(ssh-agent -s)
+    #сохраняем сгенеренный ранее приватный ключ для раннера
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 600 ~/.ssh
+  script:
+    #выполняем простую команду для проверки
+    - ssh ${DEV_USER}@${DEV_HOST} "id"
 
 sonarqube-backend-sast:
   stage: test
