@@ -45,6 +45,7 @@ deploy:
     #устанавливаем ssh-agent для удобства аутентификации по ssh
     - "command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )"
     - eval $(ssh-agent -s)
+    - curl ipinfo.io
     #сохраняем сгенеренный ранее приватный ключ для раннера
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
@@ -53,7 +54,7 @@ deploy:
     - chmod 644 ~/.ssh/known_hosts
   script:
     #выполняем простую команду для проверки
-    - ssh ${DEV_USER}@${DEV_HOST} "id"
+    - ssh -v ${DEV_USER}@${DEV_HOST} "id"
 
 sonarqube-backend-sast:
   stage: test
