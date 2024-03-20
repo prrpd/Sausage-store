@@ -1,6 +1,6 @@
 [Unit]
 Description=Start frontend for sausage-store
-After=back.service
+#After=back.service
 
 [Service]
 Type=simple
