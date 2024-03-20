@@ -27,17 +27,17 @@ build:
     - changes:
         - backend/**/*
 
-release:
-  stage: release
-  script:
-    - cd backend
-    - >
-      mvn deploy -DskipTests -s settings.xml
-      -Dversion.application=${VERSION}
-      -Dmaven.repo.local=${MAVEN_REPO_PATH}
-  rules:
-    - changes:
-        - backend/**/*
+# release:
+#   stage: release
+#   script:
+#     - cd backend
+#     - >
+#       mvn deploy -DskipTests -s settings.xml
+#       -Dversion.application=${VERSION}
+#       -Dmaven.repo.local=${MAVEN_REPO_PATH}
+#   rules:
+#     - changes:
+#         - backend/**/*
 
 deploy:
   stage: deploy
@@ -55,7 +55,7 @@ deploy:
     - chmod 644 ~/.ssh/known_hosts
   script:
     #выполняем простую команду для проверки
-    - ssh -v ${DEV_USER}@${DEV_HOST} "id"
+    - ssh -vvv ${DEV_USER}@${DEV_HOST} "id"
 # sonarqube-backend-sast:
 #   stage: test
 #   image: maven:3.8-openjdk-16
