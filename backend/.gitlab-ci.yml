@@ -54,6 +54,7 @@ deploy:
   script:
     - scp ./backend/back.service ${DEV_USER}@${DEV_HOST}:/home/${DEV_USER}/back.service
     - ssh ${DEV_USER}@${DEV_HOST} "export "CURRENT_VERSION=${VERSION}"; export "VERSION=${VERSION}"; export "DEV_HOST=${DEV_HOST}";export "NEXUS_REPO_URL=${NEXUS_REPO_URL}"; export "NEXUS_REPO_BACKEND_NAME=${NEXUS_REPO_BACKEND_NAME}"; export "NEXUS_REPO_USER=${NEXUS_REPO_USER}"; export "NEXUS_REPO_PASS=${NEXUS_REPO_PASS}";setsid /bin/bash -s " < ./backend/deploy.sh
+
 # sonarqube-backend-sast:
 #   stage: test
 #   image: maven:3.8-openjdk-16
@@ -66,12 +67,12 @@ deploy:
 # include:
 #   - template: Security/SAST.gitlab-ci.yml
 
-# spotbugs-sast:
-#   stage: test
-#   variables:
-#     COMPILE: "false"
-#     SAST_JAVA_VERSION: 11
-#     MAVEN_REPO_PATH: $CI_PROJECT_DIR/.m2/repository
+spotbugs-sast:
+  stage: test
+  variables:
+    COMPILE: "false"
+    SAST_JAVA_VERSION: 11
+    MAVEN_REPO_PATH: $CI_PROJECT_DIR/.m2/repository
 # telegram-notification-backend:
 #   stage: notify
 #   rules:
