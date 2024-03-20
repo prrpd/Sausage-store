@@ -27,17 +27,17 @@ build:
     - changes:
         - backend/**/*
 
-# release:
-#   stage: release
-#   script:
-#     - cd backend
-#     - >
-#       mvn deploy -DskipTests -s settings.xml
-#       -Dversion.application=${VERSION}
-#       -Dmaven.repo.local=${MAVEN_REPO_PATH}
-#   rules:
-#     - changes:
-#         - backend/**/*
+release:
+  stage: release
+  script:
+    - cd backend
+    - >
+      mvn deploy -DskipTests -s settings.xml
+      -Dversion.application=${VERSION}
+      -Dmaven.repo.local=${MAVEN_REPO_PATH}
+  rules:
+    - changes:
+        - backend/**/*
 
 deploy:
   stage: deploy
@@ -48,15 +48,13 @@ deploy:
     - curl ipinfo.io
     #сохраняем сгенеренный ранее приватный ключ для раннера
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - ssh-add -l
-    - ssh-add -L
     - mkdir -p ~/.ssh
     - chmod 600 ~/.ssh
     - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
   script:
-    #выполняем простую команду для проверки
-    - ssh -vvv ${DEV_USER}@${DEV_HOST} "id"
+    - scp ./backend/back.service ${DEV_USER}@${DEV_HOST}:/home/${DEV_USER}/back.service
+    - ssh ${DEV_USER}@${DEV_HOST} "export "CURRENT_VERSION=${VERSION}"; export "VERSION=${VERSION}"; export "DEV_HOST=${DEV_HOST}";export "NEXUS_REPO_URL=${NEXUS_REPO_URL}"; export "NEXUS_REPO_USER=${NEXUS_REPO_USER}"; export "NEXUS_REPO_PASS=${NEXUS_REPO_PASS}";setsid /bin/bash -s " < ./backend/deploy.sh
 # sonarqube-backend-sast:
 #   stage: test
 #   image: maven:3.8-openjdk-16
