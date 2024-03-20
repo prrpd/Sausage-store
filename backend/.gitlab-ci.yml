@@ -52,6 +52,7 @@ deploy:
     - chmod 600 ~/.ssh
     - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
+    - cat ~/.ssh/known_hosts
   script:
     #выполняем простую команду для проверки
     - ssh -v ${DEV_USER}@${DEV_HOST} "id"
