@@ -47,6 +47,7 @@ deploy:
     - eval $(ssh-agent -s)
     - curl ipinfo.io
     #сохраняем сгенеренный ранее приватный ключ для раннера
+    - echo "$SSH_PRIVATE_KEY"
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
     - chmod 600 ~/.ssh
