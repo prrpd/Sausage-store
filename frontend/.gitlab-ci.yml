@@ -18,9 +18,6 @@ build:
     - cd frontend
     - npm install
     - npm run build
-  only:
-    changes:
-      - frontend/**/*
 
 release:
   stage: release
@@ -30,9 +27,6 @@ release:
       curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}"
       --upload-file sausage-store-${VERSION}.tar.gz
       ${NEXUS_REPO_URL}/repository/${NEXUS_REPO_FRONTEND_NAME}/${VERSION}/sausage-store-${VERSION}.tar.gz
-  only:
-    changes:
-      - frontend/**/*
 
 deploy:
   stage: deploy
@@ -50,7 +44,7 @@ deploy:
     - scp ./frontend/front.service ${DEV_USER}@${DEV_HOST}:/home/${DEV_USER}/front.service
     - ssh ${DEV_USER}@${DEV_HOST} "export "CURRENT_VERSION=${VERSION}"; export "VERSION=${VERSION}"; export "DEV_HOST=${DEV_HOST}";export "NEXUS_REPO_URL=${NEXUS_REPO_URL}"; export "NEXUS_REPO_FRONTEND_NAME=${NEXUS_REPO_FRONTEND_NAME}"; export "NEXUS_REPO_USER=${NEXUS_REPO_USER}"; export "NEXUS_REPO_PASS=${NEXUS_REPO_PASS}";setsid /bin/bash -s " < ./frontend/deploy.sh
   environment:
-    name: staging
+    name: test/frontend
     url: http://std-027-58.praktikum-services.tech/
 
 sonarqube-frontend-sast:
@@ -68,12 +62,7 @@ include:
   - template: Security/Secret-Detection.gitlab-ci.yml
 # telegram-notification-frontend:
 #   stage: notify
-#   only:
-#     changes:
-#       - frontend/*
 #   variables:
 #     - $CI_COMMIT_MESSAGE =~ /send notification/
 #   script:
 #     - 'curl -X POST -H "Content-type: application/json" --data "{\"chat_id\": \"-1002042084305\", \"text\": \"Sprint 2. Frontend is ready and checked. Artifact - ${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_SHA}/download?job=${JOB_NAME}\" }" https://api.telegram.org/bot${TG_bot_token}/sendMessage'
-#   needs:
-#     - build
