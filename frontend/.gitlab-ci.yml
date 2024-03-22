@@ -60,9 +60,14 @@ sonarqube-frontend-sast:
 include:
   - template: Security/SAST.gitlab-ci.yml
   - template: Security/Secret-Detection.gitlab-ci.yml
-# telegram-notification-frontend:
-#   stage: notify
-#   variables:
-#     - $CI_COMMIT_MESSAGE =~ /send notification/
-#   script:
-#     - 'curl -X POST -H "Content-type: application/json" --data "{\"chat_id\": \"-1002042084305\", \"text\": \"Sprint 2. Frontend is ready and checked. Artifact - ${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_SHA}/download?job=${JOB_NAME}\" }" https://api.telegram.org/bot${TG_bot_token}/sendMessage'
+
+telegram-notification-frontend:
+  stage: notify
+  rules:
+    - if: $CI_COMMIT_MESSAGE =~ /send notification/
+  script:
+    - >
+      "curl -X POST -H "Content-type: application/json"
+      --data "{\"chat_id\": \"-1002042084305\", \"text\": \"Sprint 2. Frontend is ready and checked.
+      Artifact - ${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_SHA}/download?job=${JOB_NAME}\" }"
+      https://api.telegram.org/bot${TG_bot_token}/sendMessage"
