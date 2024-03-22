@@ -23,9 +23,6 @@ build:
       mvn package
       -Dversion.application=${VERSION}
       -Dmaven.repo.local=${MAVEN_REPO_PATH}
-  rules: # rules и only в данных случаях взаимозаменяемы
-    - changes:
-        - backend/**/*
 
 release:
   stage: release
@@ -35,9 +32,6 @@ release:
       mvn deploy -DskipTests -s settings.xml
       -Dversion.application=${VERSION}
       -Dmaven.repo.local=${MAVEN_REPO_PATH}
-  rules:
-    - changes:
-        - backend/**/*
 
 deploy:
   stage: deploy
@@ -70,6 +64,7 @@ sonarqube-backend-sast:
 
 include:
   - template: Security/SAST.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml
 
 spotbugs-sast:
   stage: test
