@@ -50,8 +50,10 @@ deploy:
     - scp ./backend/back.service ${DEV_USER}@${DEV_HOST}:/home/${DEV_USER}/back.service
     - ssh ${DEV_USER}@${DEV_HOST} "export "CURRENT_VERSION=${VERSION}"; export "VERSION=${VERSION}"; export "DEV_HOST=${DEV_HOST}";export "NEXUS_REPO_URL=${NEXUS_REPO_URL}"; export "NEXUS_REPO_BACKEND_NAME=${NEXUS_REPO_BACKEND_NAME}"; export "NEXUS_REPO_USER=${NEXUS_REPO_USER}"; export "NEXUS_REPO_PASS=${NEXUS_REPO_PASS}";setsid /bin/bash -s " < ./backend/deploy.sh
   environment:
-    name: test/backend
+    name: test/backend-${$CI_COMMIT_REF_NAME}
     url: http://std-027-58.praktikum-services.tech/
+  rules:
+    - when: manual
 
 sonarqube-backend-sast:
   stage: test
@@ -59,7 +61,13 @@ sonarqube-backend-sast:
   variables:
     MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
   script:
-    - mvn -f backend/pom.xml verify sonar:sonar -Dsonar.qualitygate.wait=true -Dsonar.token=$SONAR_TOKEN -Dsonar.host.url=$SONARQUBE_URL -Dsonar.projectName=$SONAR_PROJECT_KEY -Dsonar.projectKey=$SONAR_PROJECT_KEY_BACK
+    - >
+      mvn -f backend/pom.xml verify sonar:sonar
+      -Dsonar.qualitygate.wait=true
+      -Dsonar.token=$SONAR_TOKEN
+      -Dsonar.host.url=$SONARQUBE_URL
+      -Dsonar.projectName=$SONAR_PROJECT_KEY
+      -Dsonar.projectKey=$SONAR_PROJECT_KEY_BACK
   allow_failure: true
 
 include:
