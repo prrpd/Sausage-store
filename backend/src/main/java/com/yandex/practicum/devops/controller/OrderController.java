@@ -80,8 +80,13 @@ public class OrderController {
           .collect(Collectors.toList());
 
         if (!CollectionUtils.isEmpty(list)) {
+<<<<<<< 6354c65efcadcecb033e11c709ab9eac4d193860
             throw new ResourceNotFoundException("Product not found");
         }
+=======
+		throw new ResourceNotFoundException("Product not found");
+	} 
+>>>>>>> 4c998fe02633e6b53bc4dade0da5f126e62931af
     }
 
     public static class OrderForm {
