@@ -1,22 +1,56 @@
-build-backend-code-job:
-  stage: build  
-  only:
-    changes:
-    - backend/*
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - $CI_PROJECT_DIR/.m2/repository
+---
+cache:
+  paths:
+    - ${CI_PROJECT_DIR}/.m2/repository
+
+variables:
+  VERSION: 1.0.${CI_PIPELINE_ID}
+  MAVEN_REPO_PATH: ${CI_PROJECT_DIR}/.m2/repository
+  JAVA_OPTS: -XX:MaxRAMPercentage=90 # для того, чтобы Maven не съел всю свободную оперативку
+
+stages:
+  - build
+  - test
+  - release
+  - deploy
+  - notify
+
+build:
+  stage: build
   script:
     - cd backend
-    - mvn package
-  after_script:
-    - echo "JOB_NAME=$CI_JOB_NAME" >> job.env
-  artifacts:
-    paths:
-      - backend/target/sausage-store-0.0.1-SNAPSHOT.jar
-    reports:
-      dotenv: job.env
+    - >
+      mvn package
+      -Dversion.application=${VERSION}
+      -Dmaven.repo.local=${MAVEN_REPO_PATH}
+
+release:
+  stage: release
+  script:
+    - cd backend
+    - >
+      mvn deploy -DskipTests -s settings.xml
+      -Dversion.application=${VERSION}
+      -Dmaven.repo.local=${MAVEN_REPO_PATH}
+
+deploy:
+  stage: deploy
+  before_script:
+    - "command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )"
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 600 ~/.ssh
+    - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - scp ./backend/back.service ${DEV_USER}@${DEV_HOST}:/home/${DEV_USER}/back.service
+    - ssh ${DEV_USER}@${DEV_HOST} "export "CURRENT_VERSION=${VERSION}"; export "VERSION=${VERSION}"; export "DEV_HOST=${DEV_HOST}";export "NEXUS_REPO_URL=${NEXUS_REPO_URL}"; export "NEXUS_REPO_BACKEND_NAME=${NEXUS_REPO_BACKEND_NAME}"; export "NEXUS_REPO_USER=${NEXUS_REPO_USER}"; export "NEXUS_REPO_PASS=${NEXUS_REPO_PASS}";setsid /bin/bash -s " < ./backend/deploy.sh
+  environment:
+    name: test/backend
+    url: http://std-027-58.praktikum-services.tech/
+  rules:
+    - when: manual
 
 sonarqube-backend-sast:
   stage: test
@@ -24,28 +58,33 @@ sonarqube-backend-sast:
   variables:
     MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
   script:
-    - mvn -f backend/pom.xml verify sonar:sonar -Dsonar.qualitygate.wait=true -Dsonar.token=$SONAR_TOKEN -Dsonar.host.url=$SONARQUBE_URL -Dsonar.projectName=$SONAR_PROJECT_KEY -Dsonar.projectKey=$SONAR_PROJECT_KEY_BACK
+    - >
+      mvn -f backend/pom.xml verify sonar:sonar
+      -Dsonar.qualitygate.wait=true
+      -Dsonar.token=$SONAR_TOKEN
+      -Dsonar.host.url=$SONARQUBE_URL
+      -Dsonar.projectName=$SONAR_PROJECT_KEY
+      -Dsonar.projectKey=$SONAR_PROJECT_KEY_BACK
   allow_failure: true
 
 include:
   - template: Security/SAST.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml
 
 spotbugs-sast:
   stage: test
   variables:
     COMPILE: "false"
     SAST_JAVA_VERSION: 11
-    MAVEN_REPO_PATH: $CI_PROJECT_DIR/.m2/repository # не забудьте при сборке также указывать эту папку через аргумент -Dmaven.repo.local
+    MAVEN_REPO_PATH: $CI_PROJECT_DIR/.m2/repository
 
 telegram-notification-backend:
   stage: notify
-  only:
-    changes:
-    - backend/*
-    variables:
-    - $CI_COMMIT_MESSAGE =~ /send notification/
+  rules:
+    - if: $CI_COMMIT_MESSAGE =~ /send notification/
   script:
-    - 'curl -X POST -H "Content-type: application/json" --data "{\"chat_id\": \"-1002042084305\", \"text\": \"Sprint 2. Backend is ready and checked. Artifact - ${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_SHA}/download?job=${JOB_NAME}
-  \" }" https://api.telegram.org/bot${TG_bot_token}/sendMessage'
-  needs:
-    - build-backend-code-job
+    - >
+      'curl -X POST -H "Content-type: application/json"
+      --data "{\"chat_id\": \"-1002042084305\", \"text\": \"Sprint 2. Backend is ready and checked.
+      Artifact - ${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_SHA}/download?job=${JOB_NAME}\" }"
+      https://api.telegram.org/bot${TG_bot_token}/sendMessage'
