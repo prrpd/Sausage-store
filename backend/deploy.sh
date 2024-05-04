@@ -10,11 +10,14 @@ sudo cp ./sausage-store.jar /opt/sausage-store/bin/sausage-store.jar||true #"<..
 sudo chown -R backend:backend /opt/sausage-store/bin/
 
 #setting env variable to env file
-echo "PSQL_USER=${PSQL_USER}" > /etc/default/sausage-store-backend
-echo "PSQL_PASSWORD=${PSQL_PASSWORD}" >> /etc/default/sausage-store-backend
-echo "PSQL_HOST=${PSQL_HOST}" >> /etc/default/sausage-store-backend
-echo "PSQL_DBNAME=${PSQL_DBNAME}" >> /etc/default/sausage-store-backend
-echo "PSQL_PORT=${PSQL_PORT}" >> /etc/default/sausage-store-backend
+sudo bash -c 'echo "PSQL_USER=${PSQL_USER}" > /etc/default/sausage-store-backend'
+sudo bash -c 'echo "PSQL_PASSWORD=${PSQL_PASSWORD}" >> /etc/default/sausage-store-backend'
+sudo bash -c 'echo "PSQL_HOST=${PSQL_HOST}" >> /etc/default/sausage-store-backend'
+sudo bash -c 'echo "PSQL_DBNAME=${PSQL_DBNAME}" >> /etc/default/sausage-store-backend'
+sudo bash -c 'echo "PSQL_PORT=${PSQL_PORT}" >> /etc/default/sausage-store-backend'
+sudo bash -c 'echo "SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}" >> /etc/default/sausage-store-backend'
+sudo bash -c 'echo "SPRING_DATASOURCE_USERNAME=${PSQL_USER}" >> /etc/default/sausage-store-backend'
+sudo bash -c 'echo "SPRING_DATASOURCE_PASSWORD=${PSQL_PASSWORD}" >> /etc/default/sausage-store-backend'
 
 #Обновляем конфиг systemd с помощью рестарта
 sudo systemctl daemon-reload

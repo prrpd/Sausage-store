@@ -11,11 +11,6 @@ Environment="LOG_PATH=/var/sausage-store/logs"
 Environment=JAVA_HOME=/usr/lib/jvm/java-16-openjdk-amd64
 #Restart=always
 
-# Параметры подключения к БД можно указать с помощью переменных окружения SPRING
-Environment=SPRING_DATASOURCE_URL="jdbc:postgresql://${PSQL_HOST}:${PSQL_PORT}/${PSQL_DBNAME}?ssl=true"
-Environment=SPRING_DATASOURCE_USERNAME="${PSQL_USER}"
-Environment=SPRING_DATASOURCE_PASSWORD="${PSQL_PASSWORD}"
-
 ExecStart=/bin/bash -c '${JAVA_HOME}/bin/java -jar /opt/sausage-store/bin/sausage-store.jar'
 #ExecStart=/usr/bin/java -jar /opt/sausage-store/bin/sausage-store.jar
 SyslogIdentifier=sausage-backend
