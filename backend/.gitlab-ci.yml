@@ -65,13 +65,13 @@ deploy:
       export "MONGO_PASSWORD=${MONGO_PASSWORD}";
       export "MONGO_HOST=${MONGO_HOST}";
       export "MONGO_DATABASE=${MONGO_DATABASE}";
-      export "SPRING_DATA_MONGODB_URI=mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}:27018/${MONGO_DATABASE}?tls=true";
       setsid /bin/bash -s " < ./backend/deploy.sh
+      #export "SPRING_DATA_MONGODB_URI=mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}:27018/${MONGO_DATABASE}?tls=true";
   environment:
     name: test/backend
     url: http://std-027-58.praktikum-services.tech/
-  rules:
-    - when: manual
+  # rules:
+  #   - when: manual
 
 sonarqube-backend-sast:
   stage: test
