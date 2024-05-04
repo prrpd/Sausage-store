@@ -70,8 +70,8 @@ deploy:
   environment:
     name: test/backend
     url: http://std-027-58.praktikum-services.tech/
-  # rules:
-  #   - when: manual
+  rules:
+    - when: manual
 
 sonarqube-backend-sast:
   stage: test
