@@ -59,9 +59,9 @@ deploy:
       export "PSQL_DBNAME=${PSQL_DBNAME}";
       export "PSQL_PORT=${PSQL_PORT}";
       export "PSQL_HOST=${PSQL_HOST}";
-      export "SPRING_DATASOURCE_URL="jdbc:postgresql://${PSQL_HOST}:${PSQL_PORT}/${PSQL_DBNAME}?ssl=true";
-      export "SPRING_DATASOURCE_USERNAME="${PSQL_USER}";
-      export "SPRING_DATASOURCE_PASSWORD="${PSQL_PASSWORD}";
+      export "SPRING_DATASOURCE_URL=jdbc:postgresql://${PSQL_HOST}:${PSQL_PORT}/${PSQL_DBNAME}?ssl=true";
+      export "SPRING_DATASOURCE_USERNAME=${PSQL_USER}";
+      export "SPRING_DATASOURCE_PASSWORD=${PSQL_PASSWORD}";
       setsid /bin/bash -s " < ./backend/deploy.sh
   environment:
     name: test/backend
