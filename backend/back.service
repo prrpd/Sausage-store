@@ -5,11 +5,14 @@ After=network.target
 [Service]
 Type=simple
 User=backend
+EnvironmentFile=/etc/default/sausage-store-backend
 Environment="REPORT_PATH=/var/sausage-store/reports"
 Environment="LOG_PATH=/var/sausage-store/logs"
-Restart=always
-ExecStart=/usr/bin/java -jar /opt/sausage-store/bin/sausage-store.jar
+Environment=JAVA_HOME=/usr/lib/jvm/java-16-openjdk-amd64
+#Restart=always
+ExecStart=/bin/bash -c '${JAVA_HOME}/bin/java -jar /opt/sausage-store/bin/sausage-store.jar'
+#ExecStart=/usr/bin/java -jar /opt/sausage-store/bin/sausage-store.jar
 SyslogIdentifier=sausage-backend
 
 [Install]
-WantedBy=multi-user.target 
+WantedBy=multi-user.target
