@@ -18,6 +18,11 @@ sudo bash -c "echo "PSQL_PORT=${PSQL_PORT}" >> /etc/default/sausage-store-backen
 sudo bash -c "echo "SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}" >> /etc/default/sausage-store-backend"
 sudo bash -c "echo "SPRING_DATASOURCE_USERNAME=${PSQL_USER}" >> /etc/default/sausage-store-backend"
 sudo bash -c "echo "SPRING_DATASOURCE_PASSWORD=${PSQL_PASSWORD}" >> /etc/default/sausage-store-backend"
+sudo bash -c "echo "MONGO_USER=${MONGO_USER}" >> /etc/default/sausage-store-backend"
+sudo bash -c "echo "MONGO_PASSWORD=${MONGO_PASSWORD}" >> /etc/default/sausage-store-backend"
+sudo bash -c "echo "MONGO_HOST=${MONGO_HOST}" >> /etc/default/sausage-store-backend"
+sudo bash -c "echo "MONGO_DATABASE=${MONGO_DATABASE}" >> /etc/default/sausage-store-backend"
+sudo bash -c "echo "SPRING_DATA_MONGODB_URI=${SPRING_DATA_MONGODB_URI}" >> /etc/default/sausage-store-backend"
 
 #Обновляем конфиг systemd с помощью рестарта
 sudo systemctl daemon-reload
