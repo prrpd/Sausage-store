@@ -9,6 +9,19 @@ curl -u ${NEXUS_REPO_USER}:${NEXUS_REPO_PASS} -o sausage-store.jar ${NEXUS_REPO_
 sudo cp ./sausage-store.jar /opt/sausage-store/bin/sausage-store.jar||true #"<...>||true" говорит, если команда обвалится — продолжай
 sudo chown -R backend:backend /opt/sausage-store/bin/
 
+#postgres
+sudo mkdir -p /home/backend/.postgresql && \
+sudo wget "https://storage.yandexcloud.net/cloud-certs/CA.pem" -O /home/backend/.postgresql/root.crt && \
+sudo chmod 0600 /home/backend/.postgresql/root.crt
+#mongo
+sudo wget "https://storage.yandexcloud.net/cloud-certs/CA.pem" -O YandexInternalRootCA.crt
+sudo keytool -importcert \
+             -file YandexInternalRootCA.crt \
+             -alias yandex \
+             -cacerts \
+             -storepass changeit \
+             -noprompt
+
 #setting env variable to env file
 sudo bash -c "echo "PSQL_USER=${PSQL_USER}" > /etc/default/sausage-store-backend"
 sudo bash -c "echo "PSQL_PASSWORD=${PSQL_PASSWORD}" >> /etc/default/sausage-store-backend"
