@@ -20,7 +20,8 @@ sudo keytool -importcert \
              -alias yandex \
              -cacerts \
              -storepass changeit \
-             -noprompt
+             -noprompt \
+             -trustcacerts
 
 #setting env variable to env file
 sudo bash -c "echo "PSQL_USER=${PSQL_USER}" > /etc/default/sausage-store-backend"
