@@ -17,7 +17,7 @@ sudo chmod 0600 /home/backend/.postgresql/root.crt
 sudo wget "https://storage.yandexcloud.net/cloud-certs/CA.pem" -O YandexInternalRootCA.crt
 sudo keytool -importcert \
              -file YandexInternalRootCA.crt \
-             -alias yandex \
+             -alias yandex-$RANDOM \
              -cacerts \
              -storepass changeit \
              -noprompt \
