@@ -24,6 +24,7 @@ sudo keytool -importcert \
              -noprompt
 
 #setting env variable to env file
+#
 # sudo bash -c "echo "PSQL_USER=${PSQL_USER}" > /etc/default/sausage-store-backend"
 # sudo bash -c "echo "PSQL_PASSWORD=${PSQL_PASSWORD}" >> /etc/default/sausage-store-backend"
 # sudo bash -c "echo "PSQL_HOST=${PSQL_HOST}" >> /etc/default/sausage-store-backend"
