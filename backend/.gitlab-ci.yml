@@ -45,6 +45,9 @@ deploy:
     - chmod 644 ~/.ssh/known_hosts
   script:
     - scp ./backend/back.service ${DEV_USER}@${DEV_HOST}:/home/${DEV_USER}/back.service
+    - echo $ENV_FILE
+    - cat $ENV_FILE
+    - scp $(echo $ENV_FILE) ${DEV_USER}@${DEV_HOST}:/etc/default/sausage-store-backend
     - ssh ${DEV_USER}@${DEV_HOST}
       "export "CURRENT_VERSION=${VERSION}";
       export "VERSION=${VERSION}";
@@ -53,7 +56,6 @@ deploy:
       export "NEXUS_REPO_BACKEND_NAME=${NEXUS_REPO_BACKEND_NAME}";
       export "NEXUS_REPO_USER=${NEXUS_REPO_USER}";
       export "NEXUS_REPO_PASS=${NEXUS_REPO_PASS}";
-      cat ${ENV_FILE} > /etc/default/sausage-store-backend;
       export "KEYSTORE_PASS=${KEYSTORE_PASS}";
       setsid /bin/bash -s " < ./backend/deploy.sh
   environment:
