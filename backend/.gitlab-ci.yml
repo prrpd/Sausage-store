@@ -45,8 +45,6 @@ deploy:
     - chmod 644 ~/.ssh/known_hosts
   script:
     - scp ./backend/back.service ${DEV_USER}@${DEV_HOST}:/home/${DEV_USER}/back.service
-    - echo $ENV_FILE
-    - cat $ENV_FILE
     - scp $(echo $ENV_FILE) ${DEV_USER}@${DEV_HOST}:/home/${DEV_USER}/sausage-store-backend
     - ssh ${DEV_USER}@${DEV_HOST}
       "export "CURRENT_VERSION=${VERSION}";
@@ -61,8 +59,8 @@ deploy:
   environment:
     name: test/backend
     url: http://std-027-58.praktikum-services.tech/
-  # rules:
-  #   - when: manual
+  rules:
+    - when: manual
 
 sonarqube-backend-sast:
   stage: test
