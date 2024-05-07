@@ -53,19 +53,21 @@ deploy:
       export "NEXUS_REPO_BACKEND_NAME=${NEXUS_REPO_BACKEND_NAME}";
       export "NEXUS_REPO_USER=${NEXUS_REPO_USER}";
       export "NEXUS_REPO_PASS=${NEXUS_REPO_PASS}";
-      export "PSQL_USER=${PSQL_USER}";
-      export "PSQL_PASSWORD=${PSQL_PASSWORD}";
-      export "PSQL_HOST=${PSQL_HOST}";
-      export "PSQL_DBNAME=${PSQL_DBNAME}";
-      export "PSQL_PORT=${PSQL_PORT}";
-      export "PSQL_HOST=${PSQL_HOST}";
-      export "SPRING_DATASOURCE_URL=jdbc:postgresql://${PSQL_HOST}:${PSQL_PORT}/${PSQL_DBNAME}?ssl=true";
-      export "SPRING_DATASOURCE_USERNAME=${PSQL_USER}";
-      export "MONGO_USER=${MONGO_USER}";
-      export "MONGO_PASSWORD=${MONGO_PASSWORD}";
-      export "MONGO_HOST=${MONGO_HOST}";
-      export "MONGO_DATABASE=${MONGO_DATABASE}";
-      export "SPRING_DATA_MONGODB_URI=${SPRING_DATA_MONGODB_URI}";
+      cat ${ENV_FILE} > /etc/default/sausage-store-backend;
+      # export "PSQL_USER=${PSQL_USER}";
+      # export "PSQL_PASSWORD=${PSQL_PASSWORD}";
+      # export "PSQL_HOST=${PSQL_HOST}";
+      # export "PSQL_DBNAME=${PSQL_DBNAME}";
+      # export "PSQL_PORT=${PSQL_PORT}";
+      # export "PSQL_HOST=${PSQL_HOST}";
+      # export "SPRING_DATASOURCE_URL=jdbc:postgresql://${PSQL_HOST}:${PSQL_PORT}/${PSQL_DBNAME}?ssl=true";
+      # export "SPRING_DATASOURCE_USERNAME=${PSQL_USER}";
+      # export "MONGO_USER=${MONGO_USER}";
+      # export "MONGO_PASSWORD=${MONGO_PASSWORD}";
+      # export "MONGO_HOST=${MONGO_HOST}";
+      # export "MONGO_DATABASE=${MONGO_DATABASE}";
+      # export "SPRING_DATA_MONGODB_URI=${SPRING_DATA_MONGODB_URI}";
+      export "KEYSTORE_PASS=${KEYSTORE_PASS}";
       setsid /bin/bash -s " < ./backend/deploy.sh
   environment:
     name: test/backend
