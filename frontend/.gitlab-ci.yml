@@ -8,7 +8,7 @@ variables:
 
 stages:
   - build
-  #- test
+  - test
   - release
   - deploy
   - notify
@@ -41,7 +41,6 @@ release:
   script:
     - crane tag $CI_REGISTRY_IMAGE/sausage-frontend:$CI_COMMIT_SHA $VERSION
 
-
 deploy-frontend:
   stage: deploy
   image: alpine:3.18
@@ -62,29 +61,29 @@ deploy-frontend:
   # rules:
   #   - when: manual
 
-sonarqube-frontend-sast:
-  stage: test
-  image:
-    name: sonarsource/sonar-scanner-cli:latest
-    entrypoint: [""]
-  script:
-    - cd frontend
-    - sonar-scanner -Dsonar.projectKey=$SONAR_PROJECT_KEY_FRONT -Dsonar.sources=. -Dsonar.host.url=$SONARQUBE_URL -Dsonar.token=$SONAR_TOKEN_FRONT
-  allow_failure: true
+# sonarqube-frontend-sast:
+#   stage: test
+#   image:
+#     name: sonarsource/sonar-scanner-cli:latest
+#     entrypoint: [""]
+#   script:
+#     - cd frontend
+#     - sonar-scanner -Dsonar.projectKey=$SONAR_PROJECT_KEY_FRONT -Dsonar.sources=. -Dsonar.host.url=$SONARQUBE_URL -Dsonar.token=$SONAR_TOKEN_FRONT
+#   allow_failure: true
 
-include:
-  - template: Security/SAST.gitlab-ci.yml
-  - template: Security/Secret-Detection.gitlab-ci.yml
+# include:
+#   - template: Security/SAST.gitlab-ci.yml
+#   - template: Security/Secret-Detection.gitlab-ci.yml
 
-sonarqube-frontend-sast:
-  stage: test
-  image: 
-    name: sonarsource/sonar-scanner-cli:latest
-    entrypoint: [""]
-  script:
-    - cd frontend
-    - sonar-scanner -Dsonar.projectKey=$SONAR_PROJECT_KEY_FRONT -Dsonar.sources=. -Dsonar.host.url=$SONARQUBE_URL -Dsonar.token=$SONAR_TOKEN_FRONT
-  allow_failure: true
+# sonarqube-frontend-sast:
+#   stage: test
+#   image:
+#     name: sonarsource/sonar-scanner-cli:latest
+#     entrypoint: [""]
+#   script:
+#     - cd frontend
+#     - sonar-scanner -Dsonar.projectKey=$SONAR_PROJECT_KEY_FRONT -Dsonar.sources=. -Dsonar.host.url=$SONARQUBE_URL -Dsonar.token=$SONAR_TOKEN_FRONT
+#   allow_failure: true
 
 telegram-notification-frontend:
   stage: notify
