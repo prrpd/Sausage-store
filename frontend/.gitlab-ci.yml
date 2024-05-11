@@ -45,7 +45,7 @@ deploy-frontend:
   stage: deploy
   image: alpine:3.18
   before_script:
-    - apk add openssh-client bash
+    - apk add openssh-client bash gettext
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
