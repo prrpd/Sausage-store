@@ -60,8 +60,8 @@ deploy-frontend:
   environment:
     name: test/frontend
     url: http://std-027-58.praktikum-services.tech/
-  # rules:
-  #   - when: manual
+  rules:
+    - when: manual
 
 sonarqube-frontend-sast:
   stage: test
