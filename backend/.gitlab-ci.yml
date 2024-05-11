@@ -7,6 +7,7 @@ variables:
   VERSION: 1.0.${CI_PIPELINE_ID}
   MAVEN_REPO_PATH: ${CI_PROJECT_DIR}/.m2/repository
   JAVA_OPTS: -XX:MaxRAMPercentage=90 # для того, чтобы Maven не съел всю свободную оперативку
+  SAST_EXCLUDED_ANALYZERS: "eslint,nodejs-scan-sast"
 
 stages:
   - build
