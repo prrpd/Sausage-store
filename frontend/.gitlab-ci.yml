@@ -53,6 +53,7 @@ deploy-frontend:
     - chmod 600 ~/.ssh
     - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
+  script:
     - ssh ${DEV_USER}@${DEV_HOST} "mkdir -p /tmp/${CI_PROJECT_DIR}/frontend/"
     - scp ./frontend/default.conf ${DEV_USER}@${DEV_HOST}:/tmp/${CI_PROJECT_DIR}/frontend/default.conf
   environment:
