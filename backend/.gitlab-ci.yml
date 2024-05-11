@@ -17,50 +17,50 @@ stages:
 
 build:
   stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:v1.9.0-debug
+    entrypoint: [""]
+  # переменные CI_REGISTRY_USER, CI_REGISTRY_PASSWORD, CI_REGISTRY генерятся Гитлабом, их задавать не надо
   script:
-    - cd backend
-    - >
-      mvn package
-      -Dversion.application=${VERSION}
-      -Dmaven.repo.local=${MAVEN_REPO_PATH}
+    - echo "test"
+    - /kaniko/executor
+      --context "${CI_PROJECT_DIR}/backend"
+      --dockerfile "${CI_PROJECT_DIR}/backend/Dockerfile"
+      --destination "${CI_REGISTRY_IMAGE}/sausage-backend:$CI_COMMIT_SHA"
+      --build-arg VERSION=$VERSION
+      --cache=true
 
 release:
+  variables:
+    GIT_STRATEGY: none
+  image:
+    name: gcr.io/go-containerregistry/crane:debug
+    entrypoint: [""]
+  cache: []
   stage: release
-  script:
-    - cd backend
-    - >
-      mvn deploy -DskipTests -s settings.xml
-      -Dversion.application=${VERSION}
-      -Dmaven.repo.local=${MAVEN_REPO_PATH}
-
-deploy:
-  stage: deploy
   before_script:
-    - "command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )"
+    - crane auth login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - crane tag $CI_REGISTRY_IMAGE/sausage-backend:$CI_COMMIT_SHA $VERSION
+
+deploy-backend:
+  stage: deploy
+  image: alpine:3.18
+  before_script:
+    - apk add openssh-client bash
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
     - chmod 600 ~/.ssh
     - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
-  script:
-    - scp ./backend/back.service ${DEV_USER}@${DEV_HOST}:/home/${DEV_USER}/back.service
-    - scp $(echo $ENV_FILE) ${DEV_USER}@${DEV_HOST}:/home/${DEV_USER}/sausage-store-backend
-    - ssh ${DEV_USER}@${DEV_HOST}
-      "export "CURRENT_VERSION=${VERSION}";
-      export "VERSION=${VERSION}";
-      export "DEV_HOST=${DEV_HOST}";
-      export "NEXUS_REPO_URL=${NEXUS_REPO_URL}";
-      export "NEXUS_REPO_BACKEND_NAME=${NEXUS_REPO_BACKEND_NAME}";
-      export "NEXUS_REPO_USER=${NEXUS_REPO_USER}";
-      export "NEXUS_REPO_PASS=${NEXUS_REPO_PASS}";
-      export "KEYSTORE_PASS=${KEYSTORE_PASS}";
-      setsid /bin/bash -s " < ./backend/deploy.sh
+    # подставим переменные в скрипт deploy.sh и выполним его на целевом хосте, где развернем сосисочный бэкенд
+    - envsubst < ./backend/deploy.sh|ssh ${DEV_USER}@${DEV_HOST}
   environment:
     name: test/backend
     url: http://std-027-58.praktikum-services.tech/
-  rules:
-    - when: manual
+  # rules:
+  #   - when: manual
 
 sonarqube-backend-sast:
   stage: test
