@@ -13,14 +13,13 @@ FROM bellsoft/liberica-runtime-container:jre-17-slim-musl
 ARG VERSION=${VERSION}
 WORKDIR /app
 COPY --from=builder /usr/src/app/YandexInternalRootCA.crt .
-COPY --from=builder /opt/java/openjdk/lib/security/cacerts /etc/ssl/certs/java/cacerts
+COPY --from=builder /opt/java/openjdk/lib/security/cacerts /usr/lib/jvm/liberica17-container-jre/lib/security/cacerts
 RUN addgroup --system jaruser \
     && adduser -S -s /bin/false -G jaruser jaruser -D -H \
     && mkdir -p /home/jaruser/.postgresql \
     && cp YandexInternalRootCA.crt /home/jaruser/.postgresql/root.crt
 COPY --chown=jaruser:jaruser \
     --from=builder /usr/src/app/target/sausage-store-${VERSION}.jar ./sausage-store.jar
-COPY --from=builder /opt/java/openjdk/lib/security/cacerts /home/jaruser/.keystore
 EXPOSE 8080
 USER jaruser
 ENTRYPOINT ["java", "-jar", "-Dmyserver.bindPort=8080", "/app/sausage-store.jar"]
