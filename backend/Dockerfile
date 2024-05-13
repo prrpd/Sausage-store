@@ -13,6 +13,7 @@ FROM bellsoft/liberica-runtime-container:jre-17-slim-musl
 ARG VERSION=${VERSION}
 WORKDIR /app
 COPY --from=builder /usr/src/app/YandexInternalRootCA.crt .
+COPY --from=builder /etc/ssl/certs/java/cacerts /etc/ssl/certs/java/cacerts
 RUN addgroup --system jaruser \
     && adduser -S -s /bin/false -G jaruser jaruser -D -H \
     && mkdir -p /home/jaruser/.postgresql \
