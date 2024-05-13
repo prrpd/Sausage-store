@@ -20,6 +20,7 @@ RUN addgroup --system jaruser \
     && cp YandexInternalRootCA.crt /home/jaruser/.postgresql/root.crt
 COPY --chown=jaruser:jaruser \
     --from=builder /usr/src/app/target/sausage-store-${VERSION}.jar ./sausage-store.jar
+COPY --from=builder /opt/java/openjdk/lib/security/cacerts /home/jaruser/.keystore
 EXPOSE 8080
 USER jaruser
 ENTRYPOINT ["java", "-jar", "-Dmyserver.bindPort=8080", "/app/sausage-store.jar"]
