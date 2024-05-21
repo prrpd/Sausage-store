@@ -46,7 +46,7 @@ release:
 
 deploy-backend:
   stage: deploy
-  image: alpine:3.18
+  image: vault:1.11.3
   before_script:
     - apk add openssh-client bash gettext
     - eval $(ssh-agent -s)
@@ -57,6 +57,7 @@ deploy-backend:
     - chmod 644 ~/.ssh/known_hosts
     # подставим переменные в скрипт deploy.sh и выполним его на целевом хосте, где развернем сосисочный бэкенд
   script:
+    - export VAULT_TOKEN="$(vault write -field=token auth/jwt/login role=sausage-store jwt=$CI_JOB_JWT)"
     - envsubst < ./backend/deploy.sh|ssh ${DEV_USER}@${DEV_HOST}
   environment:
     name: test/backend
@@ -69,6 +70,7 @@ sonarqube-backend-sast:
   image: maven:3.8-openjdk-16
   variables:
     MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+    SPRING_CLOUD_VAULT_ENABLED: "false"
   script:
     - >
       mvn -f backend/pom.xml verify sonar:sonar
