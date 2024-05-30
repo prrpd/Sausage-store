@@ -44,7 +44,7 @@ release:
 
 deploy-frontend:
   stage: deploy
-  image: alpine:3.18
+  image: huecker.io/library/docker:24.0.7-alpine3.19
   before_script:
     - apk add openssh-client bash gettext
     - eval $(ssh-agent -s)
@@ -53,10 +53,11 @@ deploy-frontend:
     - chmod 600 ~/.ssh
     - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
+    - docker context create remote --docker "host=ssh://${DEV_USER}@${DEV_HOST}"
   script:
-    - ssh ${DEV_USER}@${DEV_HOST} "mkdir -p ~/${CI_PROJECT_DIR}/frontend/"
+    - echo VERSION=$VERSION >> deploy.env
+    - echo NGINX_CONF=$NGINX_CONF >> deploy.env
     - scp ./frontend/default.conf ${DEV_USER}@${DEV_HOST}:${NGINX_CONF}
-    - envsubst < ./frontend/deploy.sh|ssh ${DEV_USER}@${DEV_HOST}
   environment:
     name: test/frontend
     url: http://std-027-58.praktikum-services.tech/

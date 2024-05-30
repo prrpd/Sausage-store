@@ -5,7 +5,6 @@ services:
     image: ${CI_REGISTRY_IMAGE}/sausage-backend:${VERSION}
     container_name: sausage-store-backend
     environment:
-      # Переменные из application.properties можно заменить переменными окружения
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
@@ -16,17 +15,19 @@ services:
     image: ${CI_REGISTRY_IMAGE}/sausage-backend-report:${VERSION}
     container_name: sausage-store-backend-report
     environment:
-      DB: ${SPRING_DATA_MONGODB_URI}
-      PORT: 8080
+      DB: $SPRING_DATA_MONGODB_URI
+      PORT: $PORT
     networks:
       - sausage-store
   frontend:
     image: ${CI_REGISTRY_IMAGE}/sausage-frontend:${VERSION}
     container_name: sausage-store-frontend
     ports:
-      - "80:80"
+      - "8080:80"
     networks:
       - sausage-store
+    volumes:
+     - ${NGINX_CONF}:/etc/nginx/conf.d/default.conf
 
 networks:
   sausage-store:
