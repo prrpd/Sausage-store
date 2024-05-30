@@ -58,6 +58,7 @@ deploy-frontend:
     - echo VERSION=$VERSION >> deploy.env
     - echo NGINX_CONF=$NGINX_CONF >> deploy.env
     - scp ./frontend/default.conf ${DEV_USER}@${DEV_HOST}:${NGINX_CONF}
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
     - docker --context remote compose --env-file deploy.env up frontend -d --pull "always" --force-recreate
   environment:
     name: test/frontend
