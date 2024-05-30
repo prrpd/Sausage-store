@@ -55,13 +55,13 @@ deploy-backend-report:
     - chmod 644 ~/.ssh/known_hosts
     - docker context create remote --docker "host=ssh://${DEV_USER}@${DEV_HOST}"
   script:
-    #- export SPRING_DATA_MONGODB_URI=$SPRING_DATA_MONGODB_URI
+    - echo VERSION=${VERSION} >> deploy.env
+    - echo PORT=8080 >> deploy.env
+    - echo SPRING_DATA_MONGODB_URI=$SPRING_DATA_MONGODB_URI
     - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+    - ls -la
     - docker --context remote compose \
-      -e SPRING_DATA_MONGODB_URI=$SPRING_DATA_MONGODB_URI \
-      -e PORT=8080 \
-      up backend-report -d --pull "always" --force-recreate
-    #- envsubst < ./backend-report/deploy.sh|ssh ${DEV_USER}@${DEV_HOST}
+      --env-file deploy.env up backend-report -d --pull "always" --force-recreate
   environment:
     name: test/backend-report
     url: http://std-027-58.praktikum-services.tech/
