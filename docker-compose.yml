@@ -5,10 +5,10 @@ services:
     image: ${CI_REGISTRY_IMAGE}/sausage-backend:${VERSION}
     container_name: sausage-store-backend
     environment:
-      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
-      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
-      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
-      SPRING_DATA_MONGODB_URI: ${SPRING_DATA_MONGODB_URI}
+      SPRING_DATASOURCE_USERNAME: $SPRING_DATASOURCE_USERNAME
+      SPRING_DATASOURCE_PASSWORD: $SPRING_DATASOURCE_PASSWORD
+      SPRING_DATASOURCE_URL: $SPRING_DATASOURCE_URL
+      SPRING_DATA_MONGODB_URI: $SPRING_DATA_MONGODB_URI
     networks:
       - sausage-store
   backend-report:
@@ -22,12 +22,14 @@ services:
   frontend:
     image: ${CI_REGISTRY_IMAGE}/sausage-frontend:${VERSION}
     container_name: sausage-store-frontend
+    environment:
+      NGINX_CONF: /dummy
     ports:
       - "8080:80"
     networks:
       - sausage-store
     volumes:
-     - ${NGINX_CONF}:/etc/nginx/conf.d/default.conf
+      - ${NGINX_CONF}:/etc/nginx/conf.d/default.conf
 
 networks:
   sausage-store:
