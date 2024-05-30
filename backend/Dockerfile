@@ -1,4 +1,4 @@
-FROM maven:3.9.3-eclipse-temurin-20-alpine as builder
+FROM mirror.gcr.io/maven:3.9.3-eclipse-temurin-20-alpine as builder
 ARG VERSION=${VERSION}
 WORKDIR /usr/src/app
 COPY ./src ./src
@@ -9,7 +9,7 @@ RUN wget -O  YandexInternalRootCA.crt https://storage.yandexcloud.net/cloud-cert
     && mvn package -Dversion.application=${VERSION} -Dmaven.test.skip=true
 
 # шаг релиза
-FROM bellsoft/liberica-runtime-container:jre-17-slim-musl
+FROM mirror.gcr.io/bellsoft/liberica-runtime-container:jre-17-slim-musl
 ARG VERSION=${VERSION}
 WORKDIR /app
 COPY --from=builder /usr/src/app/YandexInternalRootCA.crt .

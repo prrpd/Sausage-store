@@ -1,4 +1,4 @@
-FROM node:16.20.0-alpine3.18 as builder
+FROM mirror.gcr.io/node:16.20.0-alpine3.18 as builder
 ARG VERSION=${VERSION}
 WORKDIR /usr/src/app
 COPY ./e2e ./e2e
@@ -8,7 +8,7 @@ RUN npm install \
     && npm run build
 
 # шаг релиза
-FROM nginx:stable-alpine3.17-slim
+FROM mirror.gcr.io/nginx:stable-alpine3.17-slim
 ARG VERSION=${VERSION}
 WORKDIR /app
 COPY --from=builder /usr/src/app/dist/frontend ./frontend/
