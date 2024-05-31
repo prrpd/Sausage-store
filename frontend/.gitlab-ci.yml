@@ -75,7 +75,6 @@ sonarqube-frontend-sast:
 
 include:
   - template: Security/SAST.gitlab-ci.yml
-  - template: Security/Secret-Detection.gitlab-ci.yml
 
 sonarqube-frontend-sast:
   stage: test
