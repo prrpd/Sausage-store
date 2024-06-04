@@ -18,8 +18,9 @@ docker --context remote compose --env-file deploy.env up $NEW_ENV -d --pull "alw
 echo "Waiting..."
 sleep 35s
 
-CONT=$(docker ps -f name=$NEW_ENV -q)
+CONT=$(docker --context remote ps -f name=$NEW_ENV -q)
 test=$(docker --context remote inspect --format='{{.State.Health.Status}}' $CONT)
+
 if [ $test = "healthy" ]; then
     if [ -n "$CUR_ENV" ]; then
         echo "Stopping "$CUR_ENV" container"
