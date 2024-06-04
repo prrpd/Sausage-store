@@ -11,6 +11,7 @@ else
     CUR_ENV=""
 fi
 pwd
+cat deploy.env 
 echo "Starting "$NEW_ENV" container"
 docker --context remote compose --env-file deploy.env up $NEW_ENV -d --pull "always" --force-recreate
 
