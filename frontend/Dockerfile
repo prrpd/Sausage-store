@@ -8,10 +8,8 @@ RUN npm install \
     && npm run build
 
 # шаг релиза
-FROM mirror.gcr.io/nginx:stable-alpine3.17-slim
+FROM mirror.gcr.io/nginxproxy/nginx-proxy:1.5
 ARG VERSION=${VERSION}
 WORKDIR /app
-COPY --from=builder /usr/src/app/dist/frontend ./frontend/
-COPY default.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+COPY --from=builder /usr/src/app/dist/frontend /usr/share/nginx/html/
+COPY nginx.tmpl nginx.tmpl
