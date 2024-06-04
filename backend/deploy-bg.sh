@@ -1,4 +1,5 @@
 #!/bin/sh
+set -xe
 if CONT=$(docker ps -qf name=backend-blue); then
     NEW_ENV="backend-green"
     CUR_ENV="backend-blue"
