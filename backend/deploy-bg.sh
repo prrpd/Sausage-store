@@ -27,5 +27,6 @@ if [ $test = "healthy" ]; then
         docker --context remote compose down $CUR_ENV
     fi
 else
-    echo "Container $CONT is not healthy"    
+    echo "Container $CONT is not healthy, removing $NEW_ENV service"
+    docker --context remote compose down $NEW_ENV 
 fi

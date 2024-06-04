@@ -20,8 +20,8 @@ services:
 
   backend-green:
     <<: *tmpl
-    environment:
-      VIRTUAL_PORT: 8081
+    # environment:
+    #   VIRTUAL_PORT: 8081
 
   backend-report:
     image: ${CI_REGISTRY_IMAGE}/sausage-backend-report:${VERSION}
