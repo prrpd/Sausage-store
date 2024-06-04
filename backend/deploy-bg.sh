@@ -21,3 +21,5 @@ if [ $test = "healthy" ]; then
     if [ -n "$CUR_ENV" ]; then
         echo "Stopping "$CUR_ENV" container"
         docker --context remote compose down $CUR_ENV
+    fi
+fi
