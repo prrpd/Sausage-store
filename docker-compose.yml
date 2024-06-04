@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  backend:
+  backend-blue:
     image: ${CI_REGISTRY_IMAGE}/sausage-backend:${VERSION}
     restart: unless-stopped
     environment:
@@ -13,6 +13,32 @@ services:
       VIRTUAL_PORT: 8080
     networks:
       - sausage-store
+    healthcheck:
+      test: wget --spider --quiet http://localhost:8080/actuator/health || exit 1
+      interval: 30s
+      retries: 2
+      start_period: 30s
+      timeout: 5s
+
+  # backend-green:
+  #   image: ${CI_REGISTRY_IMAGE}/sausage-backend:${VERSION}
+  #   restart: unless-stopped
+  #   environment:
+  #     SPRING_DATASOURCE_USERNAME: $SPRING_DATASOURCE_USERNAME
+  #     SPRING_DATASOURCE_PASSWORD: $SPRING_DATASOURCE_PASSWORD
+  #     SPRING_DATASOURCE_URL: $SPRING_DATASOURCE_URL
+  #     SPRING_DATA_MONGODB_URI: $SPRING_DATA_MONGODB_URI
+  #     VIRTUAL_HOST: backend
+  #     VIRTUAL_PORT: 8080
+  #   networks:
+  #     - sausage-store
+  #   healthcheck:
+  #     test: wget --spider --quiet http://localhost:8080/actuator/health || exit 1
+  #     interval: 30s
+  #     retries: 2
+  #     start_period: 30s
+  #     timeout: 5s
+
   backend-report:
     image: ${CI_REGISTRY_IMAGE}/sausage-backend-report:${VERSION}
     container_name: sausage-store-backend-report
@@ -22,6 +48,7 @@ services:
       PORT: $PORT
     networks:
       - sausage-store
+
   frontend:
     image: ${CI_REGISTRY_IMAGE}/sausage-frontend:${VERSION}
     container_name: sausage-store-frontend
