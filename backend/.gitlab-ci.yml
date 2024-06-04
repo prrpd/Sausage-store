@@ -48,7 +48,7 @@ deploy-backend:
   stage: deploy
   image: mirror.gcr.io/docker:25.0.5-alpine3.20
   before_script:
-    - apk add openssh-client bash gettext
+    - apk add openssh-client bash
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
@@ -64,7 +64,7 @@ deploy-backend:
     - echo SPRING_DATA_MONGODB_URI=$SPRING_DATA_MONGODB_URI >> deploy.env
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - pwd
-    - ../deploy-bg.sh
+    - backend/deploy-bg.sh
     #- docker --context remote compose --env-file deploy.env up backend-blue -d --pull "always" --force-recreate
   environment:
     name: test/backend
