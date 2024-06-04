@@ -64,7 +64,7 @@ deploy-backend:
     - echo SPRING_DATA_MONGODB_URI=$SPRING_DATA_MONGODB_URI >> deploy.env
     - cat deploy.env
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker --context remote compose --env-file deploy.env up backend -d --pull "always" --force-recreate
+    - docker --context remote compose --env-file deploy.env up backend-blue -d --pull "always" --force-recreate
   environment:
     name: test/backend
     url: http://std-027-58.praktikum-services.tech/
