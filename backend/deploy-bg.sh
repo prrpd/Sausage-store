@@ -10,23 +10,37 @@ else
     NEW_ENV="backend-blue"
     CUR_ENV=""
 fi
-pwd
-cat deploy.env 
+
 echo "Starting "$NEW_ENV" container"
 docker --context remote compose --env-file deploy.env up $NEW_ENV -d --pull "always" --force-recreate
 
 echo "Waiting..."
-sleep 35s
+sleep 10s
 
-CONT=$(docker --context remote ps -f name=$NEW_ENV -q)
-test=$(docker --context remote inspect --format='{{.State.Health.Status}}' $CONT)
+CONT=$(docker --context remote ps -f name=$NEW_ENV -q)max_attempts=5
+max_attempts=10
+interval=3  # Time in seconds between attempts
+attempt=0
 
-if [ $test = "healthy" ]; then
-    if [ -n "$CUR_ENV" ]; then
-        echo "Stopping "$CUR_ENV" container"
-        docker --context remote compose down $CUR_ENV
+while (( attempt < max_attempts )); do
+    attempt=$(( attempt + 1 ))
+    echo "Attempt $attempt:"
+
+    TEST=$(docker --context remote inspect --format='{{.State.Health.Status}}' $CONT)
+
+    if [ $TEST = "healthy" ]; then
+        if [ -n "$CUR_ENV" ]; then
+            echo "Stopping "$CUR_ENV" container"
+            docker --context remote compose down $CUR_ENV
+        fi
+        exit 0
     fi
-else
-    echo "Container $CONT is not healthy, removing $NEW_ENV service"
-    docker --context remote compose down $NEW_ENV 
-fi
+    sleep $interval
+done
+
+echo "Test did not pass successully after $max_attempts attempts."
+echo "Container $CONT is not healthy, removing $NEW_ENV service"
+docker --context remote compose down $NEW_ENV
+exit 1
+
+
