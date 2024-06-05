@@ -19,15 +19,13 @@ sleep 10s
 
 CONT=$(docker --context remote ps -f name=$NEW_ENV -q)
 max_attempts=10
-interval=3  # Time in seconds between attempts
+interval=3
 attempt=0
 
 while [ $attempt -le $max_attempts ]; do
     attempt=$(( attempt + 1 ))
     echo "Attempt $attempt:"
-
     TEST=$(docker --context remote inspect --format='{{.State.Health.Status}}' $CONT)
-
     if [ $TEST = "healthy" ]; then
         if [ -n "$CUR_ENV" ]; then
             echo "Stopping "$CUR_ENV" container"
