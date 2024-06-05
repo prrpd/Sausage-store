@@ -1,3 +1,6 @@
+variables:
+  FF_TIMESTAMPS: 1
+
 stages:
   - module-pipelines
 

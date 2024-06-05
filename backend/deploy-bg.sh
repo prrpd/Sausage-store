@@ -17,7 +17,7 @@ docker --context remote compose --env-file deploy.env up $NEW_ENV -d --pull "alw
 echo "Waiting..."
 sleep 10s
 
-CONT=$(docker --context remote ps -f name=$NEW_ENV -q)max_attempts=5
+CONT=$(docker --context remote ps -f name=$NEW_ENV -q)
 max_attempts=10
 interval=3  # Time in seconds between attempts
 attempt=0
