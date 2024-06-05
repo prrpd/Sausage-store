@@ -22,7 +22,7 @@ max_attempts=10
 interval=3  # Time in seconds between attempts
 attempt=0
 
-while (( attempt < max_attempts )); do
+while [ $attempt -le $max_attempts ]; do
     attempt=$(( attempt + 1 ))
     echo "Attempt $attempt:"
 
