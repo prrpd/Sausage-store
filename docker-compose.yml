@@ -1,0 +1,50 @@
+services:
+  backend-blue: &tmpl
+    image: ${CI_REGISTRY_IMAGE}/sausage-backend:${VERSION}
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_USERNAME: $SPRING_DATASOURCE_USERNAME
+      SPRING_DATASOURCE_PASSWORD: $SPRING_DATASOURCE_PASSWORD
+      SPRING_DATASOURCE_URL: $SPRING_DATASOURCE_URL
+      SPRING_DATA_MONGODB_URI: $SPRING_DATA_MONGODB_URI
+      VIRTUAL_HOST: backend
+      VIRTUAL_PORT: 8080
+    networks:
+      - sausage-store
+    healthcheck:
+      test: wget --spider --quiet http://localhost:8080/actuator/health || exit 1
+      interval: 20s
+      retries: 2
+      start_period: 20s
+      timeout: 5s
+
+  backend-green:
+    <<: *tmpl
+    # environment:
+    #   VIRTUAL_PORT: 8081
+
+  backend-report:
+    image: ${CI_REGISTRY_IMAGE}/sausage-backend-report:${VERSION}
+    container_name: sausage-store-backend-report
+    restart: unless-stopped
+    environment:
+      DB: $SPRING_DATA_MONGODB_URI
+      PORT: $PORT
+    networks:
+      - sausage-store
+
+  frontend:
+    image: ${CI_REGISTRY_IMAGE}/sausage-frontend:${VERSION}
+    container_name: sausage-store-frontend
+    restart: unless-stopped
+    environment:
+      DEFAULT_HOST: backend
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    ports:
+      - "8080:80"
+    networks:
+      - sausage-store
+
+networks:
+  sausage-store:

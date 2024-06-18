@@ -15,7 +15,6 @@ stages:
   - test
   - release
   - deploy
-  - notify
 
 build:
   stage: build
@@ -24,11 +23,10 @@ build:
     entrypoint: [""]
   # переменные CI_REGISTRY_USER, CI_REGISTRY_PASSWORD, CI_REGISTRY генерятся Гитлабом, их задавать не надо
   script:
-    - echo "test"
     - /kaniko/executor
-      --context "${CI_PROJECT_DIR}/backend"
-      --dockerfile "${CI_PROJECT_DIR}/backend/Dockerfile"
-      --destination "${CI_REGISTRY_IMAGE}/sausage-backend:$CI_COMMIT_SHA"
+      --context "${CI_PROJECT_DIR}/backend-report"
+      --dockerfile "${CI_PROJECT_DIR}/backend-report/Dockerfile"
+      --destination "${CI_REGISTRY_IMAGE}/sausage-backend-report:$CI_COMMIT_SHA"
       --build-arg VERSION=$VERSION
       --cache=true
 
@@ -43,13 +41,13 @@ release:
   before_script:
     - crane auth login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - crane tag $CI_REGISTRY_IMAGE/sausage-backend:$CI_COMMIT_SHA $VERSION
+    - crane tag $CI_REGISTRY_IMAGE/sausage-backend-report:$CI_COMMIT_SHA $VERSION
 
-deploy-backend:
+deploy-backend-report:
   stage: deploy
   image: mirror.gcr.io/docker:25.0.5-alpine3.20
   before_script:
-    - apk add openssh-client bash
+    - apk add openssh-client bash gettext
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
@@ -58,21 +56,18 @@ deploy-backend:
     - chmod 644 ~/.ssh/known_hosts
     - docker context create remote --docker "host=ssh://${DEV_USER}@${DEV_HOST}"
   script:
-    - echo VERSION=$VERSION >> deploy.env
-    - echo SPRING_DATASOURCE_URL=$SPRING_DATASOURCE_URL >> deploy.env
-    - echo SPRING_DATASOURCE_USERNAME=$SPRING_DATASOURCE_USERNAME >> deploy.env
-    - echo SPRING_DATASOURCE_PASSWORD=$SPRING_DATASOURCE_PASSWORD >> deploy.env
-    - echo SPRING_DATA_MONGODB_URI=$SPRING_DATA_MONGODB_URI >> deploy.env
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - ./backend/deploy-bg.sh
-    #- docker --context remote compose --env-file deploy.env up backend-blue -d --pull "always" --force-recreate
+    - echo VERSION=${VERSION} >> deploy.env
+    - echo PORT=8080 >> deploy.env
+    - echo SPRING_DATA_MONGODB_URI=$SPRING_DATA_MONGODB_URI
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+    - docker --context remote compose --env-file deploy.env up backend-report -d --pull "always" --force-recreate
   environment:
-    name: test/backend
+    name: test/backend-report
     url: http://std-027-58.praktikum-services.tech/
   # rules:
   #   - when: manual
 
-sonarqube-backend-sast:
+sonarqube-backend-report-sast:
   stage: test
   image: maven:3.8-openjdk-16
   variables:
@@ -97,14 +92,3 @@ spotbugs-sast:
     COMPILE: "false"
     SAST_JAVA_VERSION: 11
     MAVEN_REPO_PATH: $CI_PROJECT_DIR/.m2/repository
-
-telegram-notification-backend:
-  stage: notify
-  rules:
-    - if: $CI_COMMIT_MESSAGE =~ /send notification/
-  script:
-    - >
-      'curl -X POST -H "Content-type: application/json"
-      --data "{\"chat_id\": \"-1002042084305\", \"text\": \"Sprint 2. Backend is ready and checked.
-      Artifact - ${CI_PROJECT_URL}/-/jobs/artifacts/${CI_COMMIT_SHA}/download?job=${JOB_NAME}\" }"
-      https://api.telegram.org/bot${TG_bot_token}/sendMessage'

@@ -4,8 +4,8 @@ cache:
     - frontend/dist/frontend
 
 variables:
+  FF_TIMESTAMPS: 1
   VERSION: 1.0.${CI_PIPELINE_ID}
-  NGINX_CONF: ~/${CI_PROJECT_DIR}/frontend/default.conf
 
 stages:
   - build
@@ -44,7 +44,7 @@ release:
 
 deploy-frontend:
   stage: deploy
-  image: alpine:3.18
+  image: mirror.gcr.io/docker:25.0.5-alpine3.20
   before_script:
     - apk add openssh-client bash gettext
     - eval $(ssh-agent -s)
@@ -53,10 +53,11 @@ deploy-frontend:
     - chmod 600 ~/.ssh
     - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
+    - docker context create remote --docker "host=ssh://${DEV_USER}@${DEV_HOST}"
   script:
-    - ssh ${DEV_USER}@${DEV_HOST} "mkdir -p ~/${CI_PROJECT_DIR}/frontend/"
-    - scp ./frontend/default.conf ${DEV_USER}@${DEV_HOST}:${NGINX_CONF}
-    - envsubst < ./frontend/deploy.sh|ssh ${DEV_USER}@${DEV_HOST}
+    - echo VERSION=$VERSION >> deploy.env
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+    - docker --context remote compose --env-file deploy.env up frontend -d --pull "always" --force-recreate
   environment:
     name: test/frontend
     url: http://std-027-58.praktikum-services.tech/
@@ -75,7 +76,6 @@ sonarqube-frontend-sast:
 
 include:
   - template: Security/SAST.gitlab-ci.yml
-  - template: Security/Secret-Detection.gitlab-ci.yml
 
 sonarqube-frontend-sast:
   stage: test
