@@ -7,7 +7,6 @@ RUN npm install \
     && npm run build
 
 # шаг релиза
-FROM mirror.gcr.io/nginxproxy/nginx-proxy:1.5
+FROM mirror.gcr.io/nginx:stable-alpine-slim
 WORKDIR /app
 COPY --from=builder /usr/src/app/dist/frontend /usr/share/nginx/html/
-COPY nginx.tmpl nginx.tmpl
